@@ -1,0 +1,17 @@
+This is eMiLy.py 1.0.3 (January 2019).
+Written by Viktor Zolyomi. Licenced as free software under the GNU GPL.
+
+Minimum search of provided function with 2 parameters will commence using a budget of 30 minimum queries
+
+Stage I. Initiating random search using 15 queries
+Search complete. Found 12 local minima
+
+Stage II. Initiating active learning search relying on effective attraction spheres using 15 queries
+Mean effective attraction volume around previously found local minima: 0.752056998973
+This is 18.8014249743 percent of the total parameter space, which itself has the volume: 4.0
+Function classified as having clustered minima. Effective sphere search will commence near the spheres.
+Search complete. Found 6 local minima
+
+Minimum search complete. Found a total of 18 local minima
+
+Minima saved in LocMin.dat

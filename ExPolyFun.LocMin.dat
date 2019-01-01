@@ -1,0 +1,192 @@
+This is eMiLy.py 1.0.3 (January 2019)
+Written by Viktor Zolyomi. Licenced as free software under the GNU GPL.
+
+Minimum search completed using a budget of 30 minimum queries
+
+Results of Stage I. (random search):
+12 minima found.
+
+
+Minimum 0:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.13557920934065168,
+    0.30451509091051965
+]
+
+Minimum 1:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.3170182117915519,
+    -0.10300557173899731
+]
+
+Minimum 2:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.2886754267875453,
+    -0.16666680906817852
+]
+
+Minimum 3:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.24771503104929307,
+    -0.22304346650948736
+]
+
+Minimum 4:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -1.86511008052775e-06,
+    0.3333371220218919
+]
+
+Minimum 5:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.0693035036772378,
+    0.3260490620645334
+]
+
+Minimum 6:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    1.3827772739274112e-07,
+    -0.33333333121743475
+]
+
+Minimum 7:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.31701892382694064,
+    -0.10300582590018012
+]
+
+Minimum 8:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.3315072025877979,
+    0.034842694192714706
+]
+
+Minimum 9:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.31702187516355074,
+    0.103005918189233
+]
+
+Minimum 10:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.13557808559105064,
+    0.30451431623333153
+]
+
+Minimum 11:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.19593089179416823,
+    0.2696741017430309
+]
+
+Results of Stage II. (active learning search relying on effective attraction spheres):
+6 minima found.
+
+
+Minimum 0:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.195928633882334,
+    -0.269672295421542
+]
+
+Minimum 1:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.13557886829095642,
+    -0.3045152858574302
+]
+
+Minimum 2:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.33150758269980496,
+    -0.034842905637796094
+]
+
+Minimum 3:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.24771449375230467,
+    0.22304332638726831
+]
+
+Minimum 4:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    0.28867521410336516,
+    -0.16666666704946753
+]
+
+Minimum 5:
+
+Value of function: -0.055556
+
+List of parameters:
+[
+    -0.19592865215680286,
+    0.2696725277996367
+]

@@ -1,0 +1,22 @@
+This is the public release of eMiLy.py, a minimum search
+program written in Python 3 that relies on machine learning.
+
+List of files:
+
+0README: this file
+COPYING: GNU GPL document
+eMiLy.py: source code of main program
+exfun.py: source code of example functions
+ExPolyFun.LocMin.dat: reference data file for example function ExPolyFun()
+ExPolyFun.stdout: standard output file for example function ExPolyFun()
+ExTrigFun.LocMin.dat: reference data file for example function ExTrigFun()
+ExTrigFun.stdout: standard output file for example function ExTrigFun()
+
+Version history:
+
+1.0.3:
+
+First public release. Includes a random search and an
+effective attraction sphere based search algorithm, two
+example functions, and reference data for the output of
+eMiLy.py using those functions.

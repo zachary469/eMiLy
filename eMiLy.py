@@ -1,17 +1,33 @@
 #!/bin/python3
 '''
-This is eMiLy version 1.0.3 (January 2019 release), a machine learning
+This is eMiLy version 1.0.3a (February 2019 release), a machine learning
 minimum search program. Written by Viktor Zolyomi.
 
 Requirements:
     Python 3
-    libraries: numpy, scipy, random, json
+    libraries: numpy, scipy, random, json, time
 
 Usage:
 
-Select your choice of function for ExFun() on line 89 or 91, or import
-a custom function of your own, then set the number of parameters and your
-budget in main() according to your choice of function (see lines 261-266)
+- Select your choice of function for ExFun() in the SETUP SECTION below or import
+a custom function of your own
+- Set the number of parameters, your search budget, and search bounds in main()
+in the BUDGET SECTION according to your choice of function
+- Select minimizer in SETUP SECTION. The trf algorithm is recommended for high
+dimensional problems, but be aware that for the example functions provided it
+is much slower than the default L-BFGS-B algorithm. Note, also, that since trf
+as implemented is meant for least squares regression, it takes the square of
+the provided function before commencing minimization. Therefore, ExFun() must
+be nonnegative everywhere for trf to find the minima of ExFun(). If the provided
+function is negative anywhere in the parameter space, please do not use the trf
+algorithm in this version. If you expected your function to be non-negative and
+upon using trf you find a value of zero for your function at the lowest minimum,
+that is an indication that your function might be negative in some parts of
+the parameter space. If ExFun() is a vector of residuals, trf performs a least
+squares minimization on the residuals; this has not been tested with the code
+yet but will be for a future release.
+- Run code. The program searches for local minima in the designated parameter
+space and saves the results in the LocMin.dat file.
 
 Description:
 
@@ -24,7 +40,7 @@ which local minimum they lead to by minimization. Search begins with a random
 sweep which is then analyzed to identify the relevant regions of the parameter
 space which should subsequently be scoured by active learning.
 
-The function to be minimized must be provided in a separate python script. Two
+The function to be minimized must be provided in a separate python script. Three
 simple example functions are provided in the file exfun.py. To use the code
 with a different function, simply add the code of your custom formula to
 exfun.py and import that function as ExFun() below instead of one of the
@@ -34,9 +50,8 @@ There are 2 core functionalities in this version of the code:
 
 1) FullRand() performs a purely random search of the parameter space similar
 to random forest except here a single decision tree is used. From each random
-point a minimization is initiated using scipy.optimize.minimize. The function
-outputs the found local minima and the random points from which they were
-reached.
+point a minimization is initiated using scipy. The function outputs the found
+local minima and the random points from which they were reached.
 
 2) EffSphereSearch() takes as input the outcome of FullRand() and determines
 whether the function has its minima scattered uniformly in the parameter space
@@ -45,12 +60,14 @@ local minima away from the ones already found, whereas in the latter we expect
 the opposite. The code makes controlled random queries in the parts of the
 parameter space where it expects to find new local minima.
 
-The two example functions ExTrigFun() and ExPolyFun() are each an example
+The example functions ExTrigFun() and ExPolyFun() are each an example
 of a function with uniformly scattered and clustered minima, respectively.
 Output from eMiLy.py for each is provided in separate files using a total
 number of queries equal to the exact number of local minima in the parameter
 space. The *.stdout files contain the standard output, while the *.LocMin.dat
-files contain the local minima.
+files contain the local minima. The example function ExOtherPolyFun() is
+somewhere in between the first two example functions.
+
 
 Planned updates for future versions:
 
@@ -58,10 +75,11 @@ EffSphereSearch() currently only handles functions with clustered and uniformly
 scattered local minima. Some functions exhibit a behavior in between, i.e. they
 might have clustered minima but lots of clusters which are scattered uniformly
 all over the parameter space. For such functions, we must search both away from
-and close to the effective attraction spheres. Support for this will be added
-in the future. Moreover, the current threshold that chooses whether we expect
-the minima of the function to be clustered or not is somewhat arbitrary and
-needs optimization. Introduction of double precision is also planned.
+and close to the effective attraction spheres. In a future release the current
+approach of searching only near or far from the minima will be replaced by an
+approach where the effective attraction spheres are used not to choose where
+to look but to divide the remaining search budget into a near budget and a far
+budget as appropriate.
 
 Copyright:
 
@@ -80,15 +98,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 '''
 
+import time
 import json
 import random
 import numpy as np
 from scipy.special import gamma as GammaFun
+from scipy.optimize import least_squares as splsq
 from scipy.optimize import minimize as spmin
+
+'''
+SETUP SECTION: choose one option for ExFun (or define your own) and one for ltrf below
+'''
 # select the following to use the code with the 2-variable polynomial function in exfun.py 
 #from exfun import ExPolyFun as ExFun
 # select the following to use the code with the 10-variable cosine product function in exfun.py 
 from exfun import ExTrigFun as ExFun
+# select the following to use the code with the 10-variable polynomial function in exfun.py 
+#from exfun import ExOtherPolyFun as ExFun
+# select the following to use the trf minimzer; make sure ExFun() is always non-negative!
+#ltrf=bool(True)
+# select the following to use the L-BFGS-B minimizer
+ltrf=bool(False)
+'''
+END OF SETUP SECTION
+'''
 
 onepi=4.0*np.arctan(1.0) # value of constant pi
 
@@ -105,8 +138,8 @@ class LocMinArr:
         self.LocMinVal = LocMinVal # function value at the local minimum
         self.MinOrig = MinOrig # the point from which we arrived at LocMin
         self.LDup = LDup # 0 or 1 stating whether the local minimum is a duplicate of one found before; set to -1 if minimization failed or 2 if it led us outside the parameter space
-        self.DupPos = DupPos # integer index of the local minimum of which this is a duplicate (if LDup==true)
-        self.LMCount = LMCount # the number of unique local minima
+        self.DupPos = DupPos # integer index of the local minimum of which this is a duplicate (if LDup==1)
+        self.LMCount = LMCount # the number of unique local minima (those for which LDup==0)
 
 def FullRand(numdat,numpar,ttrange):
     '''
@@ -125,9 +158,13 @@ def FullRand(numdat,numpar,ttrange):
             ttrand[jj,ii]=ttrange[ii,0]+random.random()*(ttrange[ii,1]-ttrange[ii,0])
 # here we use scipy to find the closest local minimum to the random data point generated just above
 # if problems occur using a custom ExFun(), conisder changing the method of minimum search below to e.g. Nelder-Mead
-        cgmin=spmin(ExFun,ttrand[jj,:],method='L-BFGS-B',options={'gtol': 1e-7, 'eps':1e-7})
-#        cgmin=spmin(ExFun,ttrand[jj,:],method='Nelder-Mead')
-#        cgmin=spmin(ExFun,ttrand[jj,:],method='CG')
+        if ltrf:
+            cgmin=splsq(ExFun,ttrand[jj,:],bounds=(ttrange[:,0],ttrange[:,1]),method='trf',gtol=1e-7,loss='linear')
+#            cgmin=splsq(ExFun,ttrand[jj,:],method='trf',gtol=1e-7,loss='linear')  # select this to allow for out of range minima
+        else:
+            cgmin=spmin(ExFun,ttrand[jj,:],method='L-BFGS-B',options={'gtol': 1e-7, 'eps':1e-7})
+#            cgmin=spmin(ExFun,ttrand[jj,:],method='Nelder-Mead')
+#            cgmin=spmin(ExFun,ttrand[jj,:],method='CG')
         if cgmin.success:
             locmin[jj,:]=cgmin.x
             locminval[jj]=cgmin.fun
@@ -219,7 +256,11 @@ def EffSphereSearch(numdat,numpar,ttrange,LocMinRand):
             if npassed==numdat:
                 keep_looking=bool(False)
 # now we query the newly found set of random points
-        cgmin=spmin(ExFun,ttrand[jj,:],method='L-BFGS-B',options={'gtol': 1e-7, 'eps':1e-7})
+        if ltrf:
+            cgmin=splsq(ExFun,ttrand[jj,:],bounds=(ttrange[:,0],ttrange[:,1]),method='trf',gtol=1e-7,loss='linear')
+#            cgmin=splsq(ExFun,ttrand[jj,:],method='trf',gtol=1e-7,loss='linear')  # select this to allow for out of range minima
+        else:
+            cgmin=spmin(ExFun,ttrand[jj,:],method='L-BFGS-B',options={'gtol': 1e-7, 'eps':1e-7})
         if cgmin.success:
 #            locmin[jj,:]=(np.concatenate((cgmin.x,cgmin.fun),axis=None))
             locmin[jj,:]=cgmin.x
@@ -258,30 +299,60 @@ def EffSphereSearch(numdat,numpar,ttrange,LocMinRand):
 
     
 def main():
-# select the following two lines to use the code with the 2-variable polynomial function in exfun.py 
-#    nbudget=30 # the total budget
-#    numpar=2
-# select the following two lines to use the code with the 10-variable cosine product function in exfun.py 
-    nbudget=1024 # the total budget
+    '''
+    Main program
+    '''
+#
+    '''
+    BUDGET SECTION: select one option for nbudget, one for numpar in accordance
+    with ExFun in the SETUP SECTION, and one for ttrange 
+    '''
+# select the following two lines to use the code with the 2-variable ExPolyFun() polynomial function in exfun.py 
+#    nbudget=30 # the total search budget
+#    numpar=2 # number of parameters in ExFun
+# select the following two lines to use the code with the 10-variable ExtrigFun() cosine product function in exfun.py 
+    nbudget=1024
     numpar=10
-    print('This is eMiLy.py 1.0.3 (January 2019).\nWritten by Viktor Zolyomi. Licenced as free software under the GNU GPL.')
+# select the following two lines to use the code with the 10-variable ExOtherPolyFun() polynomial function in exfun.py 
+#    nbudget=100
+#    numpar=10
+    print('This is eMiLy.py 1.0.3a (February 2019).\nWritten by Viktor Zolyomi. Licenced as free software under the GNU GPL.')
+    if ltrf:
+        print('\n\nUsing the TRF algorithm for local minimum searches.')
+    else:
+        print('\n\nUsing the L-BFGS-B algorithm for local minimum searches.')
     numdat=nbudget//2
     ttrange=np.zeros((numpar,2))
+# set ttrange to define the bounds of the parameter space that should be searched
+# select the following for ExPolyFun and ExTrigFun
     ttrange[:,0]=-1.0
     ttrange[:,1]=1.0
+# select the following with ExOtherPolyFun for broad search
+#    ttrange[:,0]=-15.0
+#    ttrange[:,1]=15.0
+# select the following with ExOtherPolyFun for narrow search
+#    for ii in range(numpar):
+#        ttrange[:,0]=-2.0*np.sqrt(1.0*(ii+1))
+#        ttrange[:,1]=2.0*np.sqrt(1.0*(ii+1))
+    '''
+    END OF BUDGET SECTION
+    '''
     print('\nMinimum search of provided function with',numpar,'parameters will commence using a budget of',nbudget,'minimum queries')
     print('\nStage I. Initiating random search using',numdat,'queries')
+    timebegin=time.time()
     ttlocminRAND=FullRand(numdat,numpar,ttrange)
-    print('Search complete. Found',ttlocminRAND.LMCount,'local minima')
-    print('\nStage II. Initiating active learning search relying on effective attraction spheres using',numdat,'queries')
-    ttlocminES=EffSphereSearch(numdat,numpar,ttrange,ttlocminRAND)
-    print('Search complete. Found',ttlocminES.LMCount,'local minima')
-    print('\nMinimum search complete. Found a total of',ttlocminRAND.LMCount+ttlocminES.LMCount,'local minima')
+    timeRAND=time.time()-timebegin
+    print('Search complete. Found',ttlocminRAND.LMCount,'local minima in',timeRAND,'seconds')
     with open('LocMin.dat','wt') as outputfile:
-        outputfile.write('This is eMiLy.py 1.0.3 (January 2019)\nWritten by Viktor Zolyomi. Licenced as free software under the GNU GPL.\n')
+        outputfile.write('This is eMiLy.py 1.0.3a (February 2019)\nWritten by Viktor Zolyomi. Licenced as free software under the GNU GPL.\n')
+        if ltrf:
+            outputfile.write('\n\nUsing the TRF algorithm for local minimum searches.')
+        else:
+            outputfile.write('\n\nUsing the L-BFGS-B algorithm for local minimum searches.')
         outputfile.write('\nMinimum search completed using a budget of %d minimum queries\n' % nbudget)
         outputfile.write('\nResults of Stage I. (random search):\n')
         outputfile.write('%d minima found.\n' % ttlocminRAND.LMCount)
+        outputfile.write('Search time: %f seconds.\n' % timeRAND)
         lcount=0
         for ii in range(numdat):
             if ttlocminRAND.LDup[ii]==0:
@@ -290,8 +361,16 @@ def main():
                 outputfile.write('\nList of parameters:\n')
                 json.dump(ttlocminRAND.LocMin[ii,:].tolist(), outputfile, separators=(',', ':'), sort_keys=True, indent=4)
                 lcount+=1
+    print('\nStage II. Initiating active learning search relying on effective attraction spheres using',numdat,'queries')
+    timebegin=time.time()
+    ttlocminES=EffSphereSearch(numdat,numpar,ttrange,ttlocminRAND)
+    timeES=time.time()-timebegin
+    print('Search complete. Found',ttlocminES.LMCount,'local minima in',timeES,'seconds')
+    print('\nMinimum search complete. Found a total of',ttlocminRAND.LMCount+ttlocminES.LMCount,'local minima in',timeRAND+timeES,'seconds.')
+    with open('LocMin.dat','at') as outputfile:
         outputfile.write('\n\nResults of Stage II. (active learning search relying on effective attraction spheres):\n')
         outputfile.write('%d minima found.\n' % ttlocminES.LMCount)
+        outputfile.write('Search time: %f seconds.\n' % timeES)
         lcount=0
         for ii in range(numdat):
             if ttlocminES.LDup[ii]==0:
@@ -300,7 +379,12 @@ def main():
                 outputfile.write('\nList of parameters:\n')
                 json.dump(ttlocminES.LocMin[ii,:].tolist(), outputfile, separators=(',', ':'), sort_keys=True, indent=4)
                 lcount+=1
+        outputfile.write('\n\nSearch comleted.\n')
+        outputfile.write('Total search time: %f seconds.\n' % (timeRAND+timeES))
     print('\nMinima saved in LocMin.dat')
+
+
+    
 
 if __name__ == "__main__":
     main()

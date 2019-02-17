@@ -1,0 +1,229 @@
+This is eMiLy.py 1.0.3a (February 2019)
+Written by Viktor Zolyomi. Licenced as free software under the GNU GPL.
+
+
+Using the L-BFGS-B algorithm for local minimum searches.
+Minimum search completed using a budget of 30 minimum queries
+
+Results of Stage I. (random search):
+12 minima found.
+Search time: 0.040462 seconds.
+
+
+Minimum 0:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.247714290280614,
+    0.22304334463164305
+]
+
+Minimum 1:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.28867336278508204,
+    0.1666657855969578
+]
+
+Minimum 2:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.3315081608667681,
+    -0.03484287124062371
+]
+
+Minimum 3:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.24771451311292184,
+    -0.22304379304756286
+]
+
+Minimum 4:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.33150731753414686,
+    0.03484277570032174
+]
+
+Minimum 5:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.06930415046306503,
+    -0.32604909182154096
+]
+
+Minimum 6:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.31701759877101804,
+    -0.10300523039593253
+]
+
+Minimum 7:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.3170188618041903,
+    0.10300600709596357
+]
+
+Minimum 8:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.19592780612698243,
+    0.2696719039809788
+]
+
+Minimum 9:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.3170181892806496,
+    0.10300544021652519
+]
+
+Minimum 10:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.2886747597144944,
+    0.166666518484654
+]
+
+Minimum 11:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.24771509402096695,
+    -0.22304339373915344
+]
+
+Results of Stage II. (active learning search relying on effective attraction spheres):
+9 minima found.
+Search time: 0.185645 seconds.
+
+
+Minimum 0:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.19592843581254152,
+    -0.2696730047656299
+]
+
+Minimum 1:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.1959285183835991,
+    -0.2696721815334931
+]
+
+Minimum 2:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.31701891284636025,
+    -0.10300570733866234
+]
+
+Minimum 3:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.24771515333633687,
+    0.22304344907448442
+]
+
+Minimum 4:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.19592865462943038,
+    0.26967221992954765
+]
+
+Minimum 5:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    -0.06930422545289541,
+    0.32604920293725825
+]
+
+Minimum 6:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.1355784633040528,
+    0.3045149565116058
+]
+
+Minimum 7:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.33150727424788873,
+    -0.034842853355808674
+]
+
+Minimum 8:
+
+Value of function: 0.944444
+
+List of parameters:
+[
+    0.13557905452636182,
+    -0.30451496541239403
+]
+
+Search comleted.
+Total search time: 0.226107 seconds.

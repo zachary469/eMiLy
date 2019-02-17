@@ -14,7 +14,43 @@ ExTrigFun.stdout: standard output file for example function ExTrigFun()
 
 Version history:
 
-1.0.3:
+1.0.3a (February 2019):
+
+Corrected some typos in the comments in the source files and updated description
+of code in header of eMiLy.py
+
+Added timing information for Stage I and II to both standard
+output and LocMin.dat
+
+Added a new external function, ExOtherPolyFun to exfun.py
+which needs at least a search range of [-2sqrt(i):2sqtr(i)]
+for independent variable i, but can be searched in the more
+general interval of [-N,N] where N is the number of variables,
+set to 10 by default. The latter makes it more challenging
+to find all local minima on a small budget.
+
+Changed the constant term in ExPolyFun() to make the function
+non-negative everywhere.
+
+Improved file handling. Output of Stage I is now saved before
+Stage II commences. Continuous saving of new data into checkpoint
+file will be implemented at a later time.
+
+Added an optional replacement for the L-BFGS-B minimizer: the Trust Region
+Reflective (TRF) algorithm in scipy.optimize.least_squares assuming that
+ExFun equals the RMS. This allows using the algorithm itself to
+set bounds for the parameters and eliminate out of range minima
+from the search; this can be turned off in the indicated parts of
+the source code if out of range minima are of interest.
+In a future update the TRF method will enable support for external
+functions that provide not the RMS but the vector of residuals and
+therefore different loss functions other than least squares can be
+utilized. For now it is assumed that the user provided the square
+root of the loss function. Note that this is much slower than
+L-BFGS-B for simple functions such as the examples provided in ExFun.py
+but it is expected to be necessary for complicated high-dimensional problems.
+
+1.0.3 (January 2019):
 
 First public release. Includes a random search and an
 effective attraction sphere based search algorithm, two

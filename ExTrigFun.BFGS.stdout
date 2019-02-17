@@ -1,0 +1,20 @@
+This is eMiLy.py 1.0.3a (February 2019).
+Written by Viktor Zolyomi. Licenced as free software under the GNU GPL.
+
+
+Using the L-BFGS-B algorithm for local minimum searches.
+
+Minimum search of provided function with 10 parameters will commence using a budget of 1024 minimum queries
+
+Stage I. Initiating random search using 512 queries
+Search complete. Found 399 local minima in 6.918565273284912 seconds
+
+Stage II. Initiating active learning search relying on effective attraction spheres using 512 queries
+Mean effective attraction volume around previously found local minima: 0.900804758532
+This is 0.0879692147004 percent of the total parameter space, which itself has the volume: 1024.0
+Function classified as having uniformly scattered minima. Effective sphere search will commence away from the spheres.
+Search complete. Found 236 local minima in 15.040889978408813 seconds
+
+Minimum search complete. Found a total of 635 local minima in 21.959455251693726 seconds.
+
+Minima saved in LocMin.dat

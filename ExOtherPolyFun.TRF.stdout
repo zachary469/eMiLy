@@ -1,0 +1,20 @@
+This is eMiLy.py 1.0.3a (February 2019).
+Written by Viktor Zolyomi. Licenced as free software under the GNU GPL.
+
+
+Using the TRF algorithm for local minimum searches.
+
+Minimum search of provided function with 10 parameters will commence using a budget of 100 minimum queries
+
+Stage I. Initiating random search using 50 queries
+Search complete. Found 48 local minima in 23.30673885345459 seconds
+
+Stage II. Initiating active learning search relying on effective attraction spheres using 50 queries
+Mean effective attraction volume around previously found local minima: 1.56746690411e+14
+This is 26.5451896579 percent of the total parameter space, which itself has the volume: 5.9049e+14
+Function classified as having clustered minima. Effective sphere search will commence near the spheres.
+Search complete. Found 49 local minima in 28.75007128715515 seconds
+
+Minimum search complete. Found a total of 97 local minima in 52.05681014060974 seconds.
+
+Minima saved in LocMin.dat

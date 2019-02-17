@@ -1,10 +1,12 @@
 #!/bin/python3
 '''
-This file contains the external function for the eMiLy.py code. Two examples
+This file contains the external function for the eMiLy.py code. Three examples
 are provided below for testing the code. ExPolyFun() is a 2-variable sombrero
 function which has exactly 30 (degenerate) local minima. ExTrigFun() is a
 10-variable trigonometric function which, in the interval of [-1:1] for each
-of its variables contains exactly 1024 (degenerate) local minima.
+of its variables contains exactly 1024 (degenerate) local minima. ExOtherPolyFun()
+is a 4th-order polynomial function in 10 dimensions that has 1024 (degenerate)
+local minima.
 
 To use your own function, simply add your own function below and import
 that into eMiLy.py instead of one of the examples.
@@ -22,7 +24,7 @@ def ExPolyFun(XX):
         print('ExFun encountered an error: Incorrect number of variables.')
         return
     EE=np.zeros(4)
-    EE[0]=0.0
+    EE[0]=1.0
     EE[1]=-1.0
     EE[2]=5.0
     EE[3]=0.5
@@ -59,3 +61,19 @@ def ExTrigFun(XX):
 # them will satisfy abs(XX[ii])=0.5 for all values of ii. With the default
 # ndim=10 this means 1024 local minima.
     return value
+
+# simple 4th order isotropic 10-dimensional function with 1024 local minima
+def ExOtherPolyFun(XX):
+    ndim=10
+    if(XX.size!=ndim):
+        print('ExFun encountered an error: Incorrect number of variables.')
+        return
+    value=3027.0
+    for ii in range(ndim):
+        value+=(ii+1)*(XX[ii]**4)-2.0*((ii+1)**2)*(XX[ii]**2)
+    return value
+
+
+
+
+
